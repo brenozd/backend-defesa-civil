@@ -5,15 +5,11 @@ import json
 class BaseModel(db.Document):
     meta = {'abstract': True}
     @classmethod
-    def objects2dto(cls):
-        mdbs = json.loads(cls.objects().to_json())
-        dtos = []
-        for mdb in mdbs:
-            dto = mdb
-            dto['id'] = mdb['_id']['$oid']
-            del dto['_id']
-            dtos += [dto]
-        return json.dumps(dtos)
+    def objects2dto(cls, mdb):
+        dto = mdb
+        dto['id'] = mdb['_id']['$oid']
+        del dto['_id']
+        return dto
 
     @abstractclassmethod
     def ws2document(cls, ws:dict):
