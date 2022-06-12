@@ -1,4 +1,5 @@
 from abc import abstractclassmethod, abstractmethod
+import time
 
 from bson import ObjectId
 from .db import db
@@ -42,6 +43,7 @@ class BaseModel(db.Document):
         raise NotImplementedError("preparaFiltro da classe " + cls.__name__ + " nao implementada.")
 
 class Regiao(BaseModel):
+    requireds =  ["cep", "nome", "lat", "lon"]
     cep = db.StringField(required=True)
     nome = db.StringField(required=True)
     lat = db.FloatField(required=True)
@@ -52,10 +54,10 @@ class Regiao(BaseModel):
     def ws2document(cls, ws:dict):
         wsKeys = ws.keys()
         document = {
-            'cep': str(ws['cep'] if ('cep' in wsKeys) else ""),
-            'nome': str(ws['nome'] if ('nome' in wsKeys) else ""),
-            'lat': float(ws['lat'] if ('lat' in wsKeys) else 0),
-            'lon': float(ws['lon'] if ('lon' in wsKeys) else 0),
+            'cep': str(ws['cep']),
+            'nome': str(ws['nome']),
+            'lat': float(ws['lat']),
+            'lon': float(ws['lon']),
             'usuariosId': list(ws['usuariosId'] if ('usuariosId' in wsKeys) else []),
         }
 
@@ -89,6 +91,7 @@ class Regiao(BaseModel):
         return filtro
 
 class Usuario(BaseModel):
+    requireds = ['nome', 'login', 'senha', 'nascimento', 'tipo']
     nome = db.StringField(required=True)
     login = db.StringField(required=True)
     senha = db.StringField(required=True)
@@ -96,13 +99,68 @@ class Usuario(BaseModel):
     tipo = db.IntField(required=True)
     regioesId = db.ListField()
 
+    @classmethod
+    def ws2document(cls, ws:dict):
+        wsKeys = ws.keys()
+        document = {
+            'nome': str(ws['nome']),
+            'login': str(ws['login']),
+            'senha': str(ws['senha']),
+            'nascimento': int(ws['nascimento']),
+            'tipo': int(ws['tipo']),
+            'regioesId': list(ws['regioesId'] if ('regioesId' in wsKeys) else [])
+        }
+
+        return super().ws2document(document)
+
+    @classmethod
+    def preparaFiltro(cls, filtroWS):
+        filtroKeys = filtroWS.keys()
+        filtro = {}
+        if ('ids' in filtroKeys):
+            filtro['id__in'] = [ObjectId(id) for id in filtroWS['ids']]
+        if ('tipos' in filtroKeys):
+            filtro['tipo__in'] = [ObjectId(tipo) for tipo in filtroWS['tipos']]
+        if ('nomes' in filtroKeys):
+            filtro['nome__in'] = [ObjectId(nome) for nome in filtroWS['nomes']]
+        if ('logins' in filtroKeys):
+            filtro['login__in'] = [ObjectId(login) for login in filtroWS['logins']]
+        
+        return filtro
+
 class Feedback(BaseModel):
+    requireds = ['avisoId', 'tipo', 'usuarioId']
     avisoId = db.StringField(required=True)
     tipo = db.IntField(required=True)
-    risco = db.IntField(required=True)
     usuarioId = db.StringField(required=True)
 
+    @classmethod
+    def ws2document(cls, ws:dict):
+        document = {
+            'avisoId': str(ws['avisoId']),
+            'tipo': int(ws['tipo']),
+            'usuarioId': str(ws['usuarioId'])
+        }
+
+        return super().ws2document(document)
+
+    @classmethod
+    def preparaFiltro(cls, filtroWS):
+        filtroKeys = filtroWS.keys()
+        filtro = {}
+        if ('ids' in filtroKeys):
+            filtro['id__in'] = [ObjectId(id) for id in filtroWS['ids']]
+        if ('tipos' in filtroKeys):
+            filtro['tipo__in'] = [ObjectId(tipo) for tipo in filtroWS['tipos']]
+        if ('avisoIds' in filtroKeys):
+            filtro['avisoId__in'] = [ObjectId(avisoId) for avisoId in filtroWS['avisoIds']]
+        if ('usuarioIds' in filtroKeys):
+            filtro['usuarioId__in'] = [ObjectId(usuarioId) for usuarioId in filtroWS['usuarioIds']]
+        
+        return filtro
+
 class Aviso(BaseModel):
+    requireds = ['descricao', 'data_inicio', 'data_fim', 'regiaoId', 'autor', 'risco', 'tipo']    
     descricao = db.StringField(required=True)
     data_inicio = db.IntField(required=True)
     data_fim = db.IntField(required=True)
@@ -110,4 +168,53 @@ class Aviso(BaseModel):
     autor = db.StringField(required=True)
     risco = db.IntField(required=True)
     tipo = db.IntField(required=True)
-    nFeedBacks = db.IntField(required=True)
+    nFeedBacks = db.IntField()
+
+    @classmethod
+    def ws2document(cls, ws:dict):
+        wsKeys = ws.keys()
+        document = {
+            'descricao': str(ws['descricao']),
+            'data_inicio': int(ws['data_inicio']),
+            'data_fim': int(ws['data_fim']),
+            'regiaoId': str(ws['regiaoId']),
+            'autor': str(ws['autor']),
+            'risco': int(ws['risco']),
+            'tipo': int(ws['tipo']),
+            'nFeedBacks': int(ws['nFeedBacks']) if 'nFeedBacks' in wsKeys else 0
+        }
+
+        return super().ws2document(document)
+
+    @classmethod
+    def preparaFiltro(cls, filtroWS):
+        filtroKeys = filtroWS.keys()
+        filtro = {}
+        if ('ids' in filtroKeys):
+            filtro['id__in'] = [ObjectId(id) for id in filtroWS['ids']]
+        if ('tipos' in filtroKeys):
+            filtro['tipo__in'] = [ObjectId(tipo) for tipo in filtroWS['tipos']]
+        if ('riscos' in filtroKeys):
+            filtro['risco__in'] = [ObjectId(risco) for risco in filtroWS['riscos']]
+        if ('autores' in filtroKeys):
+            filtro['autor__in'] = [ObjectId(autor) for autor in filtroWS['autores']]
+        if ('data_inicio_min' in filtroKeys or 'data_inicio_max' in filtroKeys):
+            if ('data_inicio_min' in filtroKeys):
+                filtro['data_inicio__gte'] = filtroWS['data_inicio_min']
+            else:
+                filtro['data_inicio__gte'] = 0
+            if ('data_inicio_max' in filtroKeys):
+                filtro['data_inicio__lte'] = filtroWS['data_inicio_max']
+            else:
+                filtro['data_inicio__lte'] = time.time() + 604800 # por padrao vai pegar os avisos com inicio ate um mes depois
+        if ('data_fim_min' in filtroKeys or 'data_fim_max' in filtroKeys):
+            if ('data_fim_min' in filtroKeys):
+                filtro['data_fim__gte'] = filtroWS['data_fim_min']
+            else:
+                filtro['data_fim__gte'] = 0
+            if ('data_fim_max' in filtroKeys):
+                filtro['data_fim__lte'] = filtroWS['data_fim_max']
+            else:
+                filtro['data_fim__lte'] = time.time() + 2592000 # por padrao vai pegar os avisos com fim ate um mes depois
+        
+        return filtro
