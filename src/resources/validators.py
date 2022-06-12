@@ -47,10 +47,37 @@ def RegiaoFiltroValidator(func):
 
         if ('ids' in filtroKeys):
             if filtro['ids'].__class__ != list:
-                return {'message': 'O campos "ids" deve ser uma lista de string.'}, 400
+                return {'message': 'O campo "ids" deve ser uma lista de string.'}, 400
             for id in filtro['ids']:
                 if id.__class__ != str:
-                    return {'message': 'O campos "ids" deve ser uma lista de string.'}, 400
+                    return {'message': 'O campo "ids" deve ser uma lista de string.'}, 400
+        if ('ceps' in filtroKeys):
+            if filtro['ceps'].__class__ != list:
+                return {'message': 'O campo "ceps" deve ser uma lista de string.'}, 400
+            for cep in filtro['ceps']:
+                if cep.__class__ != str:
+                    return {'message': 'O campo "ceps" deve ser uma lista de string.'}, 400
+        if ('limit' in filtroKeys):
+            if (filtro['limit'].__class__ != int or filtro['limit'] < 1):
+                return {'message': 'O campo "limit" deve ser um int maior que 0.'}, 400
+        if ('skip' in filtroKeys):
+            if (filtro['skip'].__class__ != int or filtro['skip'] < 0):
+                return {'message': 'O campo "skip" deve ser um int maior ou igual a 0.'}, 400
+        if ('orderBy' in filtroKeys):
+            if (filtro['orderBy'].__class__ != str or not filtro['orderBy'].split('-')[-1].split('+')[-1] in Regiao.requireds):
+                return {'message': 'O campo "orderBy" deve ser uma str com o símbolo de ordenação (+ ou -) seguido de um dos campos obrigatórios: ' + str(Regiao.requireds) + '.'}, 400
+        if ('lat_min' in filtroKeys):
+            if ((filtro['lat_min'].__class__ != int and filtro['lat_min'].__class__ != float) or abs(filtro['lat_min']) > 90):
+                return {'message': 'O campo "lat_min" deve ser um float entre -90 e 90.'}, 400
+        if ('lat_max' in filtroKeys):
+            if ((filtro['lat_max'].__class__ != int and filtro['lat_max'].__class__ != float) or abs(filtro['lat_max']) > 90):
+                return {'message': 'O campo "lat_max" deve ser um float entre -90 e 90.'}, 400
+        if ('lon_min' in filtroKeys):
+            if ((filtro['lon_min'].__class__ != int and filtro['lon_min'].__class__ != float) or abs(filtro['lon_min']) > 90):
+                return {'message': 'O campo "lon_min" deve ser um float entre -90 e 90.'}, 400
+        if ('lon_max' in filtroKeys):
+            if ((filtro['lon_max'].__class__ != int and filtro['lon_max'].__class__ != float) or abs(filtro['lon_max']) > 90):
+                return {'message': 'O campo "lon_max" deve ser um float entre -180 e 180.'}, 400
 
         return func(self, *args, **kwargs)
     return wrapper
