@@ -10,9 +10,18 @@ class RegiaoSave(Resource):
     def post(self):
         try:
             body = request.get_json()
-            regiao = Regiao(**Regiao.ws2document(body)).save()
-            id = regiao.id
-            return {'message': 'Região salva com sucesso.', 'id':str(id)}, 200
+            if 'id' in body.keys():
+                objects = Regiao.objects(id=ObjectId(body['id']))
+                if len(objects) == 0:
+                    return {'message': 'Região não encontrada.', 'id':str(body['id'])}, 400
+                id = body['id'] 
+                del body['id']
+                objects.update_one(**body)
+                return {'message': 'Região editada com sucesso.', 'id':str(id)}, 200
+            else:
+                regiao = Regiao(**Regiao.ws2document(body)).save()
+                id = regiao.id
+                return {'message': 'Região salva com sucesso.', 'id':str(id)}, 200
         except Exception as e:
             return {'message': 'Erro ao salvar regiao - %x' % str(e)}, 500
 
