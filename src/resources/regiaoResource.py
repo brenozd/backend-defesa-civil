@@ -22,11 +22,7 @@ class RegiaoList(Resource):
     def post(self):
         try:
             body = request.get_json()
-            return {"resultado": self.listById(body)}, 200
+            return {"resultado": Regiao.list(body)}, 200
         except Exception as e:
             return {'message': 'Erro ao listar regioes - ' + str(e)}, 500
-    
-    def listById(self, filtro):
-        ids = [ObjectId(id) for id in filtro['ids']]
-        resultado = [Regiao.objects2dto(obj) for obj in json.loads(Regiao.objects(id__in=ids).to_json())]
-        return resultado
+        
