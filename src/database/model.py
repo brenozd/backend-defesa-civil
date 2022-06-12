@@ -120,11 +120,11 @@ class Usuario(BaseModel):
         if ('ids' in filtroKeys):
             filtro['id__in'] = [ObjectId(id) for id in filtroWS['ids']]
         if ('tipos' in filtroKeys):
-            filtro['tipo__in'] = [ObjectId(tipo) for tipo in filtroWS['tipos']]
+            filtro['tipo__in'] = [tipo for tipo in filtroWS['tipos']]
         if ('nomes' in filtroKeys):
-            filtro['nome__in'] = [ObjectId(nome) for nome in filtroWS['nomes']]
+            filtro['nome__in'] = [nome for nome in filtroWS['nomes']]
         if ('logins' in filtroKeys):
-            filtro['login__in'] = [ObjectId(login) for login in filtroWS['logins']]
+            filtro['login__in'] = [login for login in filtroWS['logins']]
         
         return filtro
 
@@ -151,7 +151,7 @@ class Feedback(BaseModel):
         if ('ids' in filtroKeys):
             filtro['id__in'] = [ObjectId(id) for id in filtroWS['ids']]
         if ('tipos' in filtroKeys):
-            filtro['tipo__in'] = [ObjectId(tipo) for tipo in filtroWS['tipos']]
+            filtro['tipo__in'] = [tipo for tipo in filtroWS['tipos']]
         if ('avisoIds' in filtroKeys):
             filtro['avisoId__in'] = [ObjectId(avisoId) for avisoId in filtroWS['avisoIds']]
         if ('usuarioIds' in filtroKeys):
@@ -193,11 +193,11 @@ class Aviso(BaseModel):
         if ('ids' in filtroKeys):
             filtro['id__in'] = [ObjectId(id) for id in filtroWS['ids']]
         if ('tipos' in filtroKeys):
-            filtro['tipo__in'] = [ObjectId(tipo) for tipo in filtroWS['tipos']]
+            filtro['tipo__in'] = [tipo for tipo in filtroWS['tipos']]
         if ('riscos' in filtroKeys):
-            filtro['risco__in'] = [ObjectId(risco) for risco in filtroWS['riscos']]
+            filtro['risco__in'] = [risco for risco in filtroWS['riscos']]
         if ('autores' in filtroKeys):
-            filtro['autor__in'] = [ObjectId(autor) for autor in filtroWS['autores']]
+            filtro['autor__in'] = [autor for autor in filtroWS['autores']]
         if ('data_inicio_min' in filtroKeys or 'data_inicio_max' in filtroKeys):
             if ('data_inicio_min' in filtroKeys):
                 filtro['data_inicio__gte'] = filtroWS['data_inicio_min']

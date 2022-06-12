@@ -1,4 +1,3 @@
-import json
 from bson import ObjectId
 from flask import request
 from database.model import Regiao

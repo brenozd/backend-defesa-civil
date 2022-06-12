@@ -99,7 +99,7 @@ def AvisoValidator(func):
         if len(missing) > 0:
             return {'message': 'O(s) campo(s) ' + str(missing) + ' deve(m) estar preenchido(s).'}, 400
 
-        if (not 'id' in avisoKeys or aviso['id'].__class__ != str):
+        if ('id' in avisoKeys and aviso['id'].__class__ != str):
             return {'message': 'O campo "id" deve ser uma string.'}, 400
         if (not 'descricao' in avisoKeys or aviso['descricao'].__class__ != str):
             return {'message': 'O campo "descricao" deve ser uma string.'}, 400
@@ -197,7 +197,7 @@ def FeedbackValidator(func):
         if len(missing) > 0:
             return {'message': 'O(s) campo(s) ' + str(missing) + ' deve(m) estar preenchido(s).'}, 400
 
-        if (not 'id' in feedbackKeys or feedback['id'].__class__ != str):
+        if ('id' in feedbackKeys and feedback['id'].__class__ != str):
             return {'message': 'O campo "id" deve ser uma string.'}, 400
         if (not 'avisoId' in feedbackKeys or feedback['avisoId'].__class__ != str):
             return {'message': 'O campo "avisoId" deve ser uma string.'}, 400
@@ -273,7 +273,7 @@ def UsuarioValidator(func):
         if len(missing) > 0:
             return {'message': 'O(s) campo(s) ' + str(missing) + ' deve(m) estar preenchido(s).'}, 400
 
-        if (not 'id' in usuarioKeys or usuario['id'].__class__ != str):
+        if ('id' in usuarioKeys and usuario['id'].__class__ != str):
             return {'message': 'O campo "id" deve ser uma string.'}, 400
         if (not 'nome' in usuarioKeys or usuario['nome'].__class__ != str):
             return {'message': 'O campo "nome" deve ser uma string.'}, 400
