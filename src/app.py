@@ -8,14 +8,14 @@ import argparse
 app = Flask(__name__)
 api = Api(app, default_mediatype='application/json')
 app.config['MONGODB_SETTINGS'] = {
-            'host': 'mongodb://localhost:27017/ecos02'
+            'host': 'localhost',
+            'port': '27017',
+            'db': 'ecos02'
 }
+
 app.config['MQTT_SETTINGS'] = {
             'host': 'mqtt://localhost:1883/'
 }
-
-initialize_db(app)
-initialize_routes(api)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     
     if args.mongo:
         app.config['MONGODB_SETTINGS'] = {
-            'host': 'mongodb://%s:27017/ecos02' %args.mongo
+            'host': args.mongo
         }
         print("Using mongo host: " + app.config['MONGODB_SETTINGS']['host'])
 
@@ -36,4 +36,6 @@ if __name__ == '__main__':
         }
         print("Using mqtt host: " + app.config['MQTT_SETTINGS']['host'])
 
+    initialize_db(app)
+    initialize_routes(api)
     app.run(debug=True, host="0.0.0.0")
