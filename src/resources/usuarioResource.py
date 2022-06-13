@@ -22,7 +22,7 @@ class UsuarioSave(Resource):
                 id = usuario.id
                 return {'message': 'Usuário salvo com sucesso.', 'id':str(id)}, 200
         except Exception as e:
-            return {'message': 'Erro ao salvar usuário - %x' % str(e)}, 500
+            return {'message': 'Erro ao salvar usuário - ' + str(e)}, 500
 
 
 class UsuarioList(Resource):    

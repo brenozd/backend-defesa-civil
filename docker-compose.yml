@@ -9,16 +9,13 @@ services:
     environment:
       ME_CONFIG_MONGODB_PORT: 27017
     links:
-      - mongo
+      - "mongo"
     networks:
       - app-backend
 
   mongo:
     image: mongo
-    container_name: mongo-db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: MongoDB2019!
+    container_name: mongo
     ports:
       - "27017:27017"
     volumes:
@@ -26,10 +23,26 @@ services:
     networks:
       - app-backend
 
+  broker-mqtt:
+    image: vernemq/vernemq
+    container_name: mqtt
+    environment:
+      DOCKER_VERNEMQ_ALLOW_ANONYMOUS: "on"
+      DOCKER_VERNEMQ_ACCEPT_EULA: "yes"
+    links:
+      - "mongo"
+    ports:
+      - "1883:1883"
+    networks:
+      - app-backend
+
   backend:
     image: app-backend
     container_name: app-backend
     build: $PWD
+    environment:
+      MONGO_HOST: "mongo"
+      MQTT_HOST: "mqtt"
     ports:
       - "5000:5000"
       - "80:80"
