@@ -1,4 +1,5 @@
 from abc import abstractclassmethod, abstractmethod
+from sqlite3 import InternalError
 import time
 
 from bson import ObjectId
@@ -160,7 +161,7 @@ class Feedback(BaseModel):
         return filtro
 
 class Aviso(BaseModel):
-    requireds = ['descricao', 'data_inicio', 'data_fim', 'regiaoId', 'autor', 'risco', 'tipo']    
+    requireds = ['descricao', 'data_inicio', 'data_fim', 'lat_min', 'lat_max', 'lon_min', 'lon_max', 'autor', 'risco', 'tipo']
     descricao = db.StringField(required=True)
     data_inicio = db.IntField(required=True)
     data_fim = db.IntField(required=True)
@@ -173,11 +174,21 @@ class Aviso(BaseModel):
     @classmethod
     def ws2document(cls, ws:dict):
         wsKeys = ws.keys()
+        regioes = Regiao.list({
+            'lat_min': ws['lat_min'],
+            'lat_max': ws['lat_max'],
+            'lon_min': ws['lon_min'],
+            'lon_max': ws['lon_max'],
+            'limit': 1
+        })
+        if len(regioes) == 0:
+            raise InternalError('Nenhuma região encontrada para latitude e lonngitude enviadas.')
+        regiao = regioes[0]
         document = {
             'descricao': str(ws['descricao']),
             'data_inicio': int(ws['data_inicio']),
             'data_fim': int(ws['data_fim']),
-            'regiaoId': str(ws['regiaoId']),
+            'regiaoId': str(regiao['id']),
             'autor': str(ws['autor']),
             'risco': int(ws['risco']),
             'tipo': int(ws['tipo']),
