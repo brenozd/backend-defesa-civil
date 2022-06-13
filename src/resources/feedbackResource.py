@@ -25,7 +25,7 @@ class FeedbackSave(Resource):
             return {'message': 'Erro ao salvar feedback - %x' % str(e)}, 500
 
 
-class FeedbackList(Resource):    
+class FeedbackList(Resource):
     @FeedbackFiltroValidator
     def post(self):
         try:

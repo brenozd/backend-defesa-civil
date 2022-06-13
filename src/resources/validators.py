@@ -18,7 +18,7 @@ def RegiaoValidator(func):
         if len(missing) > 0:
             return {'message': 'O(s) campo(s) ' + str(missing) + ' deve(m) estar preenchido(s).'}, 400
 
-        if (not 'id' in regiaoKeys or regiao['id'].__class__ != str):
+        if ('id' in regiaoKeys and regiao['id'].__class__ != str):
             return {'message': 'O campo "id" deve ser uma string.'}, 400
         if (not 'cep' in regiaoKeys or regiao['cep'].__class__ != str):
             return {'message': 'O campo "cep" deve ser uma string.'}, 400

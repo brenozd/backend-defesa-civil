@@ -25,7 +25,7 @@ class AvisoSave(Resource):
             return {'message': 'Erro ao salvar aviso - %x' % str(e)}, 500
 
 
-class AvisoList(Resource):    
+class AvisoList(Resource):
     @AvisoFiltroValidator
     def post(self):
         try:
