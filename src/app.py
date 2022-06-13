@@ -1,16 +1,29 @@
+#!/usr/bin/env python3
 from flask import Flask
 from database.db import initialize_db
 from flask_restful import Api
 from resources.routes import initialize_routes
+import argparse
 
 app = Flask(__name__)
 api = Api(app, default_mediatype='application/json')
 app.config['MONGODB_SETTINGS'] = {
-    'host': 'mongodb://localhost:27017/ecos02'
+            'host': 'mongodb://localhost:27017/ecos02'
 }
 
 initialize_db(app)
 initialize_routes(api)
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--mongo', type=str, required=False, action="store")
+    
+    args=parser.parse_args()
+    
+    if args.mongo:
+        app.config['MONGODB_SETTINGS'] = {
+            'host': 'mongodb://%s:27017/ecos02' %args.mongo
+        }
+
+    print("Using mongo host: " + app.config['MONGODB_SETTINGS']['host'])
     app.run(debug=True)
