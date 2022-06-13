@@ -26,6 +26,16 @@ services:
     networks:
       - app-backend
 
+  broker-mqtt:
+    image: vernemq/vernemq
+    container_name: mqtt
+    environment:
+      DOCKER_VERNEMQ_ALLOW_ANONYMOUS: "on"
+    ports:
+      - "1883:1883"
+    networks:
+      - app-backend
+
   backend:
     image: app-backend
     container_name: app-backend
