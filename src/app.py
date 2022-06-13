@@ -10,6 +10,9 @@ api = Api(app, default_mediatype='application/json')
 app.config['MONGODB_SETTINGS'] = {
             'host': 'mongodb://localhost:27017/ecos02'
 }
+app.config['MQTT_SETTINGS'] = {
+            'host': 'mqtt://localhost:1883/'
+}
 
 initialize_db(app)
 initialize_routes(api)
@@ -17,6 +20,7 @@ initialize_routes(api)
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--mongo', type=str, required=False, action="store")
+    parser.add_argument('--mqtt', type=str, required=False, action="store")
     
     args=parser.parse_args()
     
@@ -24,6 +28,12 @@ if __name__ == '__main__':
         app.config['MONGODB_SETTINGS'] = {
             'host': 'mongodb://%s:27017/ecos02' %args.mongo
         }
+        print("Using mongo host: " + app.config['MONGODB_SETTINGS']['host'])
 
-    print("Using mongo host: " + app.config['MONGODB_SETTINGS']['host'])
-    app.run(debug=True)
+    if args.mqtt:
+        app.config['MQTT_SETTINGS'] = {
+            'host': 'mqtt://%s:1883/' %args.mqtt
+        }
+        print("Using mqtt host: " + app.config['MQTT_SETTINGS']['host'])
+
+    app.run(debug=True, host="0.0.0.0")
