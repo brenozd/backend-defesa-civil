@@ -368,3 +368,23 @@ def UsuarioFiltroValidator(func):
 
         return func(self, *args, **kwargs)
     return wrapper
+
+def UsuarioAuthValidator(func):
+    @wraps(func)
+    def wrapper(self, *args, **kwargs):
+        campos = ['login', 'senha']
+        filtro = request.get_json()
+        filtroKeys = filtro.keys()
+
+        for key in filtroKeys:
+            if not key in campos:
+                return  {'message': 'O campo "' + key + '" não é reconhecido. Campos conhecidos: ' + str(campos)}, 400 
+
+        if (not 'login' in filtroKeys or filtro['login'].__class__ != str):
+            return {'message': 'O campo "login" deve ser uma string.'}, 400
+        
+        if (not 'senha' in filtroKeys or filtro['senha'].__class__ != str):
+            return {'message': 'O campo "senha" deve ser uma string.'}, 400
+
+        return func(self, *args, **kwargs)
+    return wrapper

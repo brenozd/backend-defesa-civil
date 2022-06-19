@@ -2,7 +2,7 @@ from bson import ObjectId
 from flask import request
 from database.model import Usuario
 from flask_restful import Resource
-from .validators import UsuarioValidator, UsuarioFiltroValidator
+from .validators import UsuarioAuthValidator, UsuarioValidator, UsuarioFiltroValidator
 
 class UsuarioSave(Resource):
     @UsuarioValidator
@@ -35,7 +35,7 @@ class UsuarioList(Resource):
             return {'message': 'Erro ao listar usuários - ' + str(e)}, 500
         
 class UsuarioAuth(Resource):
-    #@UsuarioCredenciais
+    @UsuarioAuthValidator
     def post(self):
         try:
             body = request.get_json()
