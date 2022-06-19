@@ -34,3 +34,11 @@ class UsuarioList(Resource):
         except Exception as e:
             return {'message': 'Erro ao listar usuários - ' + str(e)}, 500
         
+class UsuarioAuth(Resource):
+    #@UsuarioCredenciais
+    def post(self):
+        try:
+            body = request.get_json()
+            return Usuario.auth(body)
+        except Exception as e:
+            return {'message': 'Erro ao autenticar usuário - ' + str(e)}, 500

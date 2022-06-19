@@ -129,6 +129,16 @@ class Usuario(BaseModel):
         
         return filtro
 
+    @classmethod
+    def auth(cls, credenticiais: dict):
+        usuarios = cls.list({'logins': [credenticiais['login']], 'limit': 1})
+        if len(usuarios) == 0:
+            return { 'message': 'Usuário não encontrado', 'sucesso': False }, 400
+        if usuarios[0]['senha'] == credenticiais['senha']:
+            return { 'message': 'Usuário válido', 'sucesso': True }, 200
+        
+        return { 'message': 'Senha incorreta', 'sucesso': False }, 403
+
 class Feedback(BaseModel):
     requireds = ['avisoId', 'tipo', 'usuarioId']
     avisoId = db.StringField(required=True)
