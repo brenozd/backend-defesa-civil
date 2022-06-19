@@ -15,6 +15,7 @@ class AvisoSave(Resource):
                     return {'message': 'Aviso não encontrado.', 'id':str(body['id'])}, 400
                 id = body['id'] 
                 del body['id']
+                body = Aviso.findRegiao(body)
                 objects.update_one(**body)
                 return {'message': 'Aviso editado com sucesso.', 'id':str(id)}, 200
             else:
@@ -22,7 +23,7 @@ class AvisoSave(Resource):
                 id = aviso.id
                 return {'message': 'Aviso salvo com sucesso.', 'id':str(id)}, 200
         except Exception as e:
-            return {'message': 'Erro ao salvar aviso - %x' % str(e)}, 500
+            return {'message': 'Erro ao salvar aviso - ' + str(e)}, 500
 
 
 class AvisoList(Resource):

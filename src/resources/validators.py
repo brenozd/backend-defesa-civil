@@ -87,7 +87,8 @@ def RegiaoFiltroValidator(func):
 def AvisoValidator(func):
     @wraps(func)
     def wrapper(self, *args, **kwargs):
-        campos = ['id', 'descricao', 'data_inicio', 'data_fim', 'lat_min', 'lat_max', 'lon_min', 'lon_max', 'autor', 'risco', 'tipo', 'nFeedBacks']
+        campos = ['id', 'descricao', 'data_inicio', 'data_fim', 'lat_min', 'lat_max', 'lon_min', 'lon_max', 'regiaoId', 'autor', 'risco', 'tipo', 'nFeedBacks']
+        camposLat = ['lat_min', 'lat_max', 'lon_min', 'lon_max']
         aviso = request.get_json()
         avisoKeys = aviso.keys()
         for key in avisoKeys:
@@ -107,18 +108,27 @@ def AvisoValidator(func):
             return {'message': 'O campo "data_inicio" deve ser um int em timestamp.'}, 400
         if (not 'data_fim' in avisoKeys or aviso['data_fim'].__class__ != int or aviso['data_fim'] < 0):
             return {'message': 'O campo "data_fim" deve ser um int em timestamp.'}, 400
-        if ('lat_min' in avisoKeys):
-            if ((aviso['lat_min'].__class__ != int and aviso['lat_min'].__class__ != float) or abs(aviso['lat_min']) > 90):
-                return {'message': 'O campo "lat_min" deve ser um float entre -90 e 90.'}, 400
-        if ('lat_max' in avisoKeys):
-            if ((aviso['lat_max'].__class__ != int and aviso['lat_max'].__class__ != float) or abs(aviso['lat_max']) > 90):
-                return {'message': 'O campo "lat_max" deve ser um float entre -90 e 90.'}, 400
-        if ('lon_min' in avisoKeys):
-            if ((aviso['lon_min'].__class__ != int and aviso['lon_min'].__class__ != float) or abs(aviso['lon_min']) > 180):
-                return {'message': 'O campo "lon_min" deve ser um float entre -180 e 180.'}, 400
-        if ('lon_max' in avisoKeys):
-            if ((aviso['lon_max'].__class__ != int and aviso['lon_max'].__class__ != float) or abs(aviso['lon_max']) > 180):
-                return {'message': 'O campo "lon_max" deve ser um float entre -180 e 180.'}, 400
+        if ('regiaoId' in avisoKeys):
+            if (aviso['regiaoId'].__class__ != str):
+                return {'message': 'O campo "regiaoId" deve ser uma string.'}, 400
+        else:
+            missing = [key for key in camposLat if not key in avisoKeys]
+            if len(missing) > 0:
+                return {'message': 'O(s) campo(s) ' + str(missing) + ' deve(m) estar preenchido(s).'}, 400
+            else:
+                if ('lat_min' in avisoKeys):
+                    if ((aviso['lat_min'].__class__ != int and aviso['lat_min'].__class__ != float) or abs(aviso['lat_min']) > 90):
+                        return {'message': 'O campo "lat_min" deve ser um float entre -90 e 90.'}, 400
+                if ('lat_max' in avisoKeys):
+                    if ((aviso['lat_max'].__class__ != int and aviso['lat_max'].__class__ != float) or abs(aviso['lat_max']) > 90):
+                        return {'message': 'O campo "lat_max" deve ser um float entre -90 e 90.'}, 400
+                if ('lon_min' in avisoKeys):
+                    if ((aviso['lon_min'].__class__ != int and aviso['lon_min'].__class__ != float) or abs(aviso['lon_min']) > 180):
+                        return {'message': 'O campo "lon_min" deve ser um float entre -180 e 180.'}, 400
+                if ('lon_max' in avisoKeys):
+                    if ((aviso['lon_max'].__class__ != int and aviso['lon_max'].__class__ != float) or abs(aviso['lon_max']) > 180):
+                        return {'message': 'O campo "lon_max" deve ser um float entre -180 e 180.'}, 400
+        
         if (not 'autor' in avisoKeys or aviso['autor'].__class__ != str):
             return {'message': 'O campo "autor" deve ser uma string.'}, 400
         if (not 'risco' in avisoKeys or aviso['risco'].__class__ != int):
@@ -135,12 +145,13 @@ def AvisoFiltroValidator(func):
     @wraps(func)
     def wrapper(self, *args, **kwargs):
         campos = ['ids', 'tipos', 'riscos', 'autores', 'data_inicio_min', 'data_inicio_max', 'data_fim_min', 'data_fim_max', 'limit', 'orderBy', 'skip']
+        camposLat = ['lat_min', 'lon_min', 'lat_max', 'lon_max']
         filtro = request.get_json()
         filtroKeys = filtro.keys()
 
         for key in filtroKeys:
-            if not key in campos:
-                return  {'message': 'O campo "' + key + '" não é reconhecido. Campos conhecidos: ' + str(campos)}, 400 
+            if not key in campos + camposLat:
+                return  {'message': 'O campo "' + key + '" não é reconhecido. Campos conhecidos: ' + str(campos+camposLat)}, 400 
 
         if ('ids' in filtroKeys):
             if filtro['ids'].__class__ != list:
@@ -148,6 +159,12 @@ def AvisoFiltroValidator(func):
             for id in filtro['ids']:
                 if id.__class__ != str:
                     return {'message': 'O campo "ids" deve ser uma lista de string.'}, 400
+
+        if (any(key in camposLat for key in filtroKeys)):
+            missing = [key for key in camposLat if not key in filtroKeys]
+            if len(missing) > 0:
+                return {'message': 'Todos os campos ' + str(camposLat) + ' devem estar preenchidos para filtrar por coordenadas.'}, 400
+
         if ('limit' in filtroKeys):
             if (filtro['limit'].__class__ != int or filtro['limit'] < 1):
                 return {'message': 'O campo "limit" deve ser um int maior que 0.'}, 400

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import json
 from flask import Flask
 from database.db import initialize_db
 from flask_restful import Api
@@ -28,7 +29,6 @@ if __name__ == '__main__':
         app.config['MONGODB_SETTINGS'] = {
             'host': args.mongo
         }
-        print("Using mongo host: " + app.config['MONGODB_SETTINGS']['host'])
 
     if args.mqtt:
         app.config['MQTT_SETTINGS'] = {

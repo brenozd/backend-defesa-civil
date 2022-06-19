@@ -161,7 +161,7 @@ class Feedback(BaseModel):
         return filtro
 
 class Aviso(BaseModel):
-    requireds = ['descricao', 'data_inicio', 'data_fim', 'lat_min', 'lat_max', 'lon_min', 'lon_max', 'autor', 'risco', 'tipo']
+    requireds = ['descricao', 'data_inicio', 'data_fim', 'autor', 'risco', 'tipo']
     descricao = db.StringField(required=True)
     data_inicio = db.IntField(required=True)
     data_fim = db.IntField(required=True)
@@ -174,28 +174,39 @@ class Aviso(BaseModel):
     @classmethod
     def ws2document(cls, ws:dict):
         wsKeys = ws.keys()
-        regioes = Regiao.list({
-            'lat_min': ws['lat_min'],
-            'lat_max': ws['lat_max'],
-            'lon_min': ws['lon_min'],
-            'lon_max': ws['lon_max'],
-            'limit': 1
-        })
-        if len(regioes) == 0:
-            raise InternalError('Nenhuma região encontrada para latitude e lonngitude enviadas.')
-        regiao = regioes[0]
+        ws = cls.findRegiao(ws)
         document = {
             'descricao': str(ws['descricao']),
             'data_inicio': int(ws['data_inicio']),
             'data_fim': int(ws['data_fim']),
-            'regiaoId': str(regiao['id']),
+            'regiaoId': str(ws['regiaoId']),
             'autor': str(ws['autor']),
             'risco': int(ws['risco']),
             'tipo': int(ws['tipo']),
             'nFeedBacks': int(ws['nFeedBacks']) if 'nFeedBacks' in wsKeys else 0
         }
 
-        return super().ws2document(document)
+        return document
+    
+    @classmethod
+    def findRegiao(cls, ws:dict):
+        wsKeys = ws.keys()
+        if (not 'regiaoId' in wsKeys):
+            regioes = Regiao.list({
+                'lat_min': ws['lat_min'],
+                'lat_max': ws['lat_max'],
+                'lon_min': ws['lon_min'],
+                'lon_max': ws['lon_max'],
+                'limit': 1
+            })
+            if len(regioes) == 0:
+                raise InternalError('Nenhuma região encontrada para latitude e lonngitude enviadas.')
+            ws['regiaoId'] = regioes[0]['id']
+            del ws['lat_min']
+            del ws['lat_max']
+            del ws['lon_min']
+            del ws['lon_max']
+        return ws
 
     @classmethod
     def preparaFiltro(cls, filtroWS):
@@ -227,5 +238,13 @@ class Aviso(BaseModel):
                 filtro['data_fim__lte'] = filtroWS['data_fim_max']
             else:
                 filtro['data_fim__lte'] = time.time() + 2592000 # por padrao vai pegar os avisos com fim ate um mes depois
+        if ('lat_min' in filtroKeys):
+            regioes = Regiao.list({
+                'lat_min': filtroWS['lat_min'],
+                'lat_max': filtroWS['lat_max'],
+                'lon_min': filtroWS['lon_min'],
+                'lon_max': filtroWS['lon_max'],
+            })
+            filtro['regiaoId__in'] = [regiao['id'] for regiao in regioes]
         
         return filtro
