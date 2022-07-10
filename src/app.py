@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-import json
 from flask import Flask
 from database.db import initialize_db
 from flask_restful import Api
+from resources.avisoResource import connect_mqtt
 from resources.routes import initialize_routes
 import argparse
 
@@ -36,6 +36,8 @@ if __name__ == '__main__':
         }
         print("Using mqtt host: " + app.config['MQTT_SETTINGS']['host'])
 
+    print('Trying to connect with id: %s, user: %s, password: %s, broker: %s, port: %d' % ('ecos02-pub', 'ecos02', '', args.mqtt, 1883))
+    connect_mqtt('ecos02-pub', '', '', args.mqtt, 1883)
     initialize_db(app)
     initialize_routes(api)
     app.run(debug=True, host="0.0.0.0")

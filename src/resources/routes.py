@@ -1,10 +1,10 @@
+from flask_restful import Api
 from resources.avisoResource import AvisoList, AvisoSave
 from resources.feedbackResource import FeedbackList, FeedbackSave
 from resources.usuarioResource import UsuarioAuth, UsuarioList, UsuarioSave
 from .regiaoResource import RegiaoSave, RegiaoList
 
-
-def initialize_routes(api):
+def initialize_routes(api: Api):
     api.add_resource(RegiaoSave, '/api/regiao/save')
     api.add_resource(RegiaoList, '/api/regiao/list')
     api.add_resource(UsuarioSave, '/api/usuario/save')
