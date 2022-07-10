@@ -21,12 +21,12 @@ class AvisoSave(Resource):
                 del body['id']
                 body = Aviso.findRegiao(body)
                 objects.update_one(**body)
-                self.mqqt_client.publish('avisos', payload=json.dumps(body))
+                self.mqtt_client.publish('avisos', payload=json.dumps(body))
                 return {'message': 'Aviso editado com sucesso.', 'id':str(id)}, 200
             else:
                 aviso = Aviso(**Aviso.ws2document(body)).save()
                 id = aviso.id
-                self.mqqt_client.publish('avisos', payload=json.dumps(aviso))
+                self.mqtt_client.publish('avisos', payload=json.dumps(aviso))
                 return {'message': 'Aviso salvo com sucesso.', 'id':str(id)}, 200
         except Exception as e:
             return {'message': 'Erro ao salvar aviso - ' + str(e)}, 500
@@ -40,7 +40,6 @@ class AvisoList(Resource):
         except Exception as e:
             return {'message': 'Erro ao listar avisos - ' + str(e)}, 500
         
-
 def connect_mqtt(client_id, username, password, broker, port):
     global client_mqtt
     def on_connect(client, userdata, flags, rc):
