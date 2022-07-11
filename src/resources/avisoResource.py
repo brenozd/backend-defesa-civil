@@ -59,7 +59,5 @@ def connect_mqtt(client_id, username, password, broker, port):
     client.username_pw_set(username, password)
     client.on_connect = on_connect
     client.on_publish = on_publish
-    client.loop_start()
     client.connect(broker, port)
-    client.loop_stop()
     client_mqtt = client
