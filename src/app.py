@@ -36,7 +36,7 @@ if __name__ == '__main__':
         }
         print("Using mqtt host: " + app.config['MQTT_SETTINGS']['host'])
 
-    print('Trying to connect with id: %s, user: %s, password: %s, broker: %s, port: %d' % ('ecos02-pub', 'ecos02', '', args.mqtt, 1883))
+    print('Trying to connect with id: %s, user: %s, password: %s, broker: %s, port: %d' % ('ecos02-pub', '', '', args.mqtt, 1883))
     connect_mqtt('ecos02-pub', '', '', args.mqtt, 1883)
     initialize_db(app)
     initialize_routes(api)
