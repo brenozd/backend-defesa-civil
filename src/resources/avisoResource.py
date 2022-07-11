@@ -23,13 +23,13 @@ class AvisoSave(Resource):
                 body = Aviso.findRegiao(body)
                 objects.update_one(**body)
                 client_mqtt.loop_start()
-                client_mqtt.publish('Itajuba', payload=json.dumps(body))
+                client_mqtt.publish('itajuba', payload=json.dumps(body))
                 return {'message': 'Aviso editado com sucesso.', 'id':str(id)}, 200
             else:
                 aviso = Aviso(**Aviso.ws2document(body)).save()
                 id = aviso.id
                 client_mqtt.loop_start()
-                client_mqtt.publish('Itajuba', payload=json.dumps(Aviso.ws2document(body)))
+                client_mqtt.publish('itajuba', payload=json.dumps(Aviso.ws2document(body)))
                 return {'message': 'Aviso salvo com sucesso.', 'id':str(id)}, 200
         except Exception as e:
             return {'message': 'Erro ao salvar aviso - ' + str(e)}, 500
@@ -46,7 +46,6 @@ class AvisoList(Resource):
 def connect_mqtt(client_id, username, password, broker, port):
     global client_mqtt
     def on_connect(client, userdata, flags, rc):
-        print(f'client: {client}, userdata: {userdata}, flags: {flags}, rc: {rc}')
         if rc == 0:
             print("Connected to MQTT Broker!")
         else:
@@ -56,8 +55,11 @@ def connect_mqtt(client_id, username, password, broker, port):
 
     # Set Connecting Client ID
     client = mqtt_client.Client(client_id, clean_session=True)
+    print(f'username: "{username}", password: "{password}"')
     client.username_pw_set(username, password)
     client.on_connect = on_connect
     client.on_publish = on_publish
+    client.loop_start()
     client.connect(broker, port)
+    client.loop_stop()
     client_mqtt = client
